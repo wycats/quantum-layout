@@ -1,0 +1,12 @@
+.switcher {
+  --threshold: min-width;
+  --space: var(--s1);
+}
+
+.switcher {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: auto;
+  row-gap: var(--block-space);
+  column-gap: var(--inline-space);
+}

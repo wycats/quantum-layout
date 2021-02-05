@@ -1,0 +1,49 @@
+.with-sidebar {
+  --grid-template-columns: minmax(min-content, max-content);
+  display: grid;
+  grid-auto-flow: column;
+  gap: var(--inline-space);
+  grid-template-columns: var(--grid-template-columns);
+}
+
+.with-sidebar.narrow\:start {
+  --grid-template-columns: minmax(min-content, max-content) 1fr;
+}
+
+.with-sidebar.narrow\:end {
+  --grid-template-columns: 1fr minmax(min-content, max-content);
+}
+
+body.debug .with-sidebar {
+  --debug-border-hue: var(--debug-sidebar-first-hue);
+}
+
+body.debug .with-sidebar::after {
+  --debug-name: "sidebar";
+}
+
+body.debug .with-sidebar > * {
+  --debug-border-hue: var(--debug-sidebar-first-hue);
+}
+
+body.debug .with-sidebar > :first-child {
+  --debug-hue: var(--debug-sidebar-first-hue);
+}
+
+body.debug .with-sidebar > :last-child {
+  --debug-hue: var(--debug-sidebar-second-hue);
+}
+
+body.debug .with-sidebar:hover {
+  --debug-hue: var(--debug-sidebar-second-hue);
+}
+
+body.debug .with-sidebar:hover > *:first-child {
+  --debug-name-fallback: "smaller";
+  --debug-hue: var(--debug-sidebar-first-hue);
+}
+
+body.debug .with-sidebar:hover > *:last-child {
+  --debug-name-fallback: "larger";
+  --debug-hue: var(--debug-sidebar-second-hue);
+}

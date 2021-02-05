@@ -1,0 +1,4 @@
+.box {
+  display: grid;
+  grid-template-columns: 100%;
+}

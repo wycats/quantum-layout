@@ -1,0 +1,26 @@
+:root {
+  --fg: hsl(0, 0%, 30%);
+  --light-fg: hsl(0, 0%, 50%);
+}
+
+html {
+  font-weight: 400;
+}
+
+.div\:pre,
+pre,
+code,
+pre code,
+textarea {
+  font-family: Recursive;
+  --vf-mono: 1;
+  --vf-ital: 1;
+  font-size: var(--s-1);
+  font-weight: 400;
+}
+
+#output {
+  color: var(--light-fg);
+  font-style: italic;
+  font-weight: 400;
+}

@@ -1,0 +1,9 @@
+.text {
+  min-width: 25ch;
+  max-width: 75ch;
+}
+
+.display {
+  min-width: 25ch;
+  max-width: 75ch;
+}

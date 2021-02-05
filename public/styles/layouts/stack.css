@@ -1,0 +1,32 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  /* width: min-content; */
+}
+
+.stack > * {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.stack > * + * {
+  margin-top: var(--block-space);
+}
+
+body.debug .stack {
+  --debug-border-hue: var(--debug-stack-hue);
+}
+
+body.debug .stack > * {
+  --debug-border-hue: var(--debug-stack-hue);
+}
+
+body.debug .stack:hover {
+  --debug-hue: var(--debug-stack-hue);
+}
+
+body.debug .stack:hover > * {
+  --debug-name-fallback: "stack item";
+  --debug-hue: var(--debug-stack-hue);
+}

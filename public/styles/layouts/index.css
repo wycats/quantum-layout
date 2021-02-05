@@ -1,0 +1,19 @@
+@import "./center.css";
+@import "./cluster.css";
+@import "./grid.css";
+@import "./sidebar.css";
+@import "./stack.css";
+@import "./wrapper.css";
+@import "./switch.css";
+@import "./debug.css";
+@import "./text.css";
+@import "./box.css";
+
+:root {
+  --debug-sidebar-first-hue: 150;
+  --debug-sidebar-second-hue: 0;
+  --debug-stack-hue: 240;
+  --debug-stack-entry-hue: 255;
+  --debug-dot-lightness: 30%;
+  --debug-hover-lightness: 70%;
+}

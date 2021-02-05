@@ -1,0 +1,33 @@
+{
+  "name": "quantum-layout",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "bootstrap": "swc -c ./.swcrc -d ./public/bootstrap ./bootstrap/*.ts -s inline --ignore ./bootstrap/*.d.ts -w",
+    "prebootstrap": "rm -f ./public/bootstrap/*"
+  },
+  "pnpm": {
+    "overrides": {
+      "typescript": "^4.2.0-dev.20210202"
+    }
+  },
+  "linthtmlConfig": {
+    "indent-width": 2
+  },
+  "devDependencies": {
+    "@forlagshuset/simple-fs": "^0.4.1",
+    "@linthtml/linthtml": "^0.6.0",
+    "@swc/cli": "^0.1.34",
+    "@swc/core": "^1.2.47",
+    "@swc/wasm": "^1.2.47",
+    "@swc/wasm-web": "^1.2.43",
+    "@typescript-eslint/eslint-plugin": "^4.14.2",
+    "@typescript-eslint/parser": "^4.14.2",
+    "eslint": "^7.19.0",
+    "eslint-import-resolver-typescript": "^2.3.0",
+    "eslint-plugin-import": "^2.22.1",
+    "localforage": "^1.9.0",
+    "sass": "^1.32.6",
+    "typescript": "^4.2.0-dev.20210202"
+  }
+}

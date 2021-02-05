@@ -1,0 +1,5 @@
+.wrapper {
+  display: grid;
+  grid-auto-flow: columns;
+  grid-template-columns: 1fr;
+}

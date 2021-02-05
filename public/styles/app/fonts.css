@@ -1,0 +1,29 @@
+@font-face {
+  font-family: "Golos UI";
+  src: url("../../fonts/Golos-UI_VF.woff2") format("woff2-variations");
+  font-weight: 1 999;
+  font-stretch: 75% 100%;
+  /* font-variation-settings: "ital" 1; */
+  font-style: oblique 0deg 20deg;
+}
+
+@font-face {
+  font-family: "Recursive";
+  font-style: oblique 0deg 15deg;
+  font-weight: 1 999;
+  font-stretch: 75% 100%;
+  font-display: swap;
+  src: url("../../fonts/Recursive_VF_1.072.ttf") format("truetype-variations");
+}
+
+/* :root {
+  --vf-mono: 0;
+  --vf-casl: 0;
+  --vf-slnt: 0;
+  --vf-ital: 0.5;
+} */
+
+/* html {
+  font-variation-settings: "MONO" var(--vf-mono) "CASL" var(--vf-casl) "slnt"
+    var(--vf-slnt) "ital" var(--vf-ital);
+} */

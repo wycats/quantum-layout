@@ -1,0 +1,88 @@
+html {
+  width: 100%;
+}
+
+body {
+  min-width: var(--measure) / 2;
+}
+
+textarea {
+  max-width: 100%;
+  line-height: calc(1em * var(--ratio));
+}
+
+nav > div:not(:last-child) > button:first-child {
+  border: none;
+  background-color: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+#module-list {
+  --row-gap: var(--block-space);
+  --column-gap: var(--inline-space);
+
+  display: grid;
+
+  grid-template-columns: minmax(min-content, max-content) 1fr;
+  grid-auto-rows: max-content;
+  row-gap: var(--row-gap);
+  column-gap: var(--column-gap);
+}
+
+#module-list > .filename {
+  justify-self: start;
+}
+
+#module-list .fa {
+  color: hsl(0, 0%, 50%);
+  cursor: pointer;
+}
+
+#module-list .fa:hover {
+  color: hsl(0, 0%, 30%);
+  cursor: pointer;
+}
+
+button {
+  --hue: 200;
+  --button-fg: hsl(var(--hue), 100%, 50%);
+
+  font-family: Recursive;
+
+  display: grid;
+  height: 2em;
+  align-content: center;
+  transition-property: color, background-color, font-weight;
+  transition-duration: 0.1s;
+  cursor: pointer;
+  background-color: transparent;
+  color: var(--button-fg);
+  border: 1px solid var(--button-fg);
+  font-weight: 400;
+  border-radius: 0.2rem;
+}
+
+button:hover {
+  color: white;
+  background-color: var(--button-fg);
+}
+
+button:active {
+  color: white;
+  font-weight: 450;
+  background-color: hsl(var(--hue), 100%, 40%);
+}
+
+button.filename {
+  height: max-content;
+}
+
+button.icon-button {
+  display: grid;
+  border-radius: 50%;
+  background-color: hsl(0, 50%, 80%);
+  height: 3ch;
+  width: 3ch;
+  align-content: center;
+}

@@ -1,0 +1,88 @@
+/** border */
+body.debug :is(.with-sidebar, .with-sidebar > *, .stack, .stack > *) {
+  position: relative;
+}
+
+body.debug :is(.with-sidebar, .with-sidebar > *, .stack, .stack > *)::before,
+body.debug :is(.with-sidebar, .with-sidebar > *, .stack, .stack > *)::after {
+  position: absolute;
+}
+
+body.debug :is(.with-sidebar, .with-sidebar > *, .stack, .stack > *)::after {
+  content: "";
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* opacity: 50%; */
+  pointer-events: none;
+  border-color: hsl(var(--debug-border-hue), 100%, 50%);
+  border-width: var(--border-width);
+  border-style: var(--border-style);
+}
+
+body.debug :is(.with-sidebar > *, .stack > *)::after,
+body.debug :is(.with-sidebar > *, .stack > *)::before {
+  --border-width: 1px;
+  --border-style: dotted;
+}
+
+body.debug :is(.with-sidebar, .stack)::after {
+  --border-width: 1px;
+  --border-style: solid;
+}
+
+/** debug dot */
+body.debug :is(.with-sidebar > *, .stack > *)::before {
+  background-color: hsla(
+    var(--debug-hue),
+    100%,
+    var(--debug-dot-lightness),
+    60%
+  );
+}
+
+body.debug :is(.with-sidebar > *, .stack > *)::before {
+  position: absolute;
+  content: "";
+  width: var(--s-2);
+  height: var(--s-2);
+  top: var(--border-width);
+  right: var(--border-width);
+  clip-path: circle(calc(var(--s-2) / 2) at 50% 50%);
+  z-index: 1999;
+}
+
+/** hover text */
+body.debug :is(.with-sidebar:hover > *, .stack:hover > *)::before {
+  clip-path: inherit;
+  width: auto;
+  height: auto;
+  padding: 0 var(--s-3);
+  font-size: var(--s-1);
+}
+
+/** overlay */
+body.debug :is(.with-sidebar:hover, .stack:hover)::after {
+  content: "🠬 " var(--debug-name) " 🠮";
+  display: flex;
+  font-weight: 900;
+  flex-direction: column;
+  text-align: center;
+  justify-content: center;
+  /* opacity: 30%; */
+  background-color: hsla(var(--debug-hue), 100%, 50%, 15%);
+  color: hsl(var(--debug-hue), 100%, 50%);
+}
+
+/** text */
+body.debug :is(.with-sidebar:hover > *, .stack:hover > *)::before {
+  content: var(--debug-name, var(--debug-name-fallback));
+  background-color: hsla(
+    var(--debug-hue),
+    100%,
+    var(--debug-hover-lightness),
+    100%
+  );
+  color: hsla(var(--debug-hue), 10%, 10%, 100%);
+}

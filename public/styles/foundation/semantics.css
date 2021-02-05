@@ -1,0 +1,26 @@
+/**
+ * This file captures situations where HTML elements exist, but don't map onto ARIA roles (or
+ * accessibility APIs).
+ *
+ * The idea is just to remind ourselves of the difference between HTML elements with clean semantic
+ * mappings, and HTML elements that are basically just renamed <div>s.
+ *
+ * See: https://www.w3.org/TR/html-aria/ See:
+ * https://www.w3.org/TR/html-aam-1.0/#html-element-role-mappings
+ */
+
+/**
+ * https://w3c.github.io/html-aria/#el-pre (no corresponding role)
+ * https://www.w3.org/TR/html-aam-1.0/#html-element-role-mappings (no consistent AAM mapping)
+ */
+.div\:pre {
+  white-space: pre-wrap;
+}
+
+/**
+ * https://w3c.github.io/html-aria/#el-p (no corresponding role)
+ * https://www.w3.org/TR/html-aam-1.0/#html-element-role-mappings (pretty consistent "paragraph"
+ * concept)
+ */
+p {
+}

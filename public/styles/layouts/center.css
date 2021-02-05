@@ -1,0 +1,9 @@
+.center {
+  --max-width: 1000px;
+  box-sizing: content-box;
+  margin-left: auto;
+  margin-right: auto;
+  min-width: min(min-content, auto);
+  max-width: var(--max-width);
+  /* max-width: var(--max-width); */
+}

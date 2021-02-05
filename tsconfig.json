@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "target": "es2019",
+    "module": "es2020",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "noEmit": true,
+    "isolatedModules": true,
+    "strict": true,
+    "moduleResolution": "node",
+    "baseUrl": "./",
+    "paths": {
+      "https://cdn.skypack.dev/localforage@1.9.0": ["types/localforage"],
+      "https://cdn.skypack.dev/@forlagshuset/simple-fs@0.4.1": [
+        "types/simple-fs"
+      ]
+    },
+    "rootDirs": [],
+    "typeRoots": [],
+    "types": [],
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "src/**/*.ts",
+    "public/**/*.js",
+    "bootstrap-src/**/*.ts",
+    "types/**/*.d.ts",
+    "bootstrap/register-sw.js"
+  ]
+}

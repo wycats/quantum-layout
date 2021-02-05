@@ -1,0 +1,58 @@
+@import "./app/index.css";
+
+:root {
+  --border-thin: var(--s-5);
+  --border-thick: var(--s-2);
+  line-height: calc(1em * var(--ratio));
+}
+
+:root {
+  font-size: calc(1rem + 0.333vw);
+}
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+  font-size: 1rem;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: "Golos UI";
+}
+
+body > * {
+  display: none;
+}
+
+body.rendered\:loading > .loading {
+  display: block;
+}
+
+body.rendered\:loading > :not(.loading) {
+  display: none;
+}
+
+body.rendered\:error > .error {
+  display: block;
+}
+
+body.rendered\:error > :not(.error) {
+  display: none;
+}
+
+body.rendered\:loaded > .loaded {
+  display: block;
+}
+
+body.rendered\:loaded > :not(.loaded) {
+  display: none;
+}
+
+hr {
+  border: 1px solid var(--fg);
+  background-color: var(--fg);
+}
