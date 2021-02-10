@@ -3,7 +3,7 @@
     "allowJs": true,
     "target": "es2019",
     "module": "es2020",
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "lib": ["ESNext", "DOM", "DOM.Iterable", "WebWorker"],
     "noEmit": true,
     "isolatedModules": true,
     "strict": true,
@@ -22,11 +22,5 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": [
-    "src/**/*.ts",
-    "public/**/*.js",
-    "bootstrap-src/**/*.ts",
-    "types/**/*.d.ts",
-    "bootstrap/register-sw.js"
-  ]
+  "include": ["src/**/*.ts", "bootstrap-src/**/*.ts", "types/**/*.d.ts"]
 }

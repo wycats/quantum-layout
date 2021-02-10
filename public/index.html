@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/icons/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/icons/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/icons/favicon-16x16.png"
+    />
+    <link rel="manifest" href="/icons/site.webmanifest" />
+    <title>Experiment</title>
+    <link rel="stylesheet" href="/main.css" />
+    <script type="module" src="/main.js"></script>
+  </head>
+  <body class="center padding:1 rendered:loading">
+    <main class="loading">Loading...</main>
+    <main class="error">
+      Something went wrong. Check the JavaScript console for more information.
+    </main>
+    <main class="loaded stack">
+      <div class="with-sidebar">
+        <nav id="module-list" class="inline-space:-2"></nav>
+        <div class="stack space:-1">
+          <h1 id="h1-source-code">Source Code</h1>
+          <form class="stack" id="transform">
+            <label class="with-sidebar narrow:start">
+              <p>Module Name</p>
+              <span class="wrapper" style="--debug-name: 'input field'"
+                ><input id="module-name" name="filename" type="text"
+              /></span>
+            </label>
+            <textarea
+              name="code"
+              id="module-source"
+              aria-labelledby="h1-source-code"
+              rows="10"
+            ></textarea>
+            <div class="grid">
+              <button type="submit" id="save">Save Module</button>
+              <button type="button" id="delete">Delete Module</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <hr />
+      <h2>Output</h2>
+      <div id="output" class="div:pre"></div>
+    </main>
+  </body>
+</html>

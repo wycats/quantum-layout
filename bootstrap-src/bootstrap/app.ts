@@ -4,10 +4,11 @@ import SimpleFS, {
   Stats,
 } from "https://cdn.skypack.dev/@forlagshuset/simple-fs@0.4.1";
 import { ElementFacade, FormDesc, FormFacade } from "./dom.js";
-import { boot, SugaryExports } from "./index.js";
+import { boot } from "./index.js";
 import { Maybe, Result } from "./result.js";
 import type * as swc from "@swc/core";
 import { bootObservers } from "./resize.js";
+import { SugaryExports } from "./wasm.js";
 
 const ELEMENTS = {
   form: {
@@ -151,7 +152,7 @@ export class App {
   }
 
   private transform(code: string): Result<swc.Output> {
-    return this.#delegate.wasm.transform(code);
+    return Result.lift(this.#delegate.wasm.transform(code));
   }
 
   boot() {

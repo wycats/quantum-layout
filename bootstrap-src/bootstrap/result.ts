@@ -1,5 +1,3 @@
-import { compileBundleOptions } from "@swc/core/spack";
-
 type IntoResult<T extends object> = T | Result<T> | string;
 
 export abstract class Maybe<T> {
