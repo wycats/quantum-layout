@@ -2,6 +2,8 @@ import { ENV } from "../env";
 import { FetchManager } from "../manager/interfaces";
 
 class SkypackFetchManager implements FetchManager {
+  readonly name = "skypack";
+
   matches(request: Request, url: URL): boolean {
     return (
       url.hostname === "cdn.skypack.dev" && !url.pathname.startsWith("/-/")

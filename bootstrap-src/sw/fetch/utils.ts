@@ -36,3 +36,22 @@ function addingHeaders(
   }
   return headers;
 }
+
+class HexDigest {
+  async response(response: Response) {
+    let body = await response.arrayBuffer();
+    return this.buffer(body);
+  }
+
+  // https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
+  async buffer(buffer: ArrayBuffer) {
+    const hashBuffer = await crypto.subtle.digest("SHA-256", buffer); // hash the message
+    const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
+    const hashHex = hashArray
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join(""); // convert bytes to hex string
+    return hashHex;
+  }
+}
+
+export const DIGEST = new HexDigest();

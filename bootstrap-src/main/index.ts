@@ -1,5 +1,7 @@
 import { SW } from "../bootstrap/register-sw.js";
 
+console.log("BYE!!");
+
 async function boot() {
   try {
     await SW;

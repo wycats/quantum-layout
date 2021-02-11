@@ -88,6 +88,7 @@ async function registerSW() {
     } else return Promise.reject();
 }
 const SW = registerSW();
+console.log("BYE!!");
 async function boot() {
     try {
         await SW;

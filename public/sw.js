@@ -54,7 +54,7 @@ function traceArgs(args) {
         };
     }
 }
-const ENV = Environment.default("\u{1f9d9}").enable("manager");
+const ENV = Environment.default("\u{1f9d9}").enable("manager", "cache", "error");
 const ENV1 = ENV;
 function addingHeaders2(original, adding) {
     let headers = new Headers(original);
@@ -62,6 +62,19 @@ function addingHeaders2(original, adding) {
     return headers;
 }
 const addingHeaders1 = addingHeaders2;
+const LOCAL_CACHE = caches.open("embroider.local");
+class LocalFetchManager {
+    matches(request, url) {
+        return url.origin === origin;
+    }
+    async fetch(request, url, manifest) {
+        return fetchLocal(request, url, manifest);
+    }
+    constructor(){
+        this.name = "local";
+    }
+}
+const FETCH_LOCAL = new LocalFetchManager();
 function updatedResponse(response, { body =response.body , status =response.status , statusText =response.statusText , headers: addHeaders , replaceHeaders  }) {
     let headers = replaceHeaders ? new Headers(replaceHeaders) : addingHeaders3(response.headers, addHeaders || {
     });
@@ -76,16 +89,40 @@ function addingHeaders3(original, adding) {
     for (let [key, value] of Object.entries(adding))headers.set(key, value);
     return headers;
 }
-class LocalFetchManager {
-    matches(request, url) {
-        return url.origin === origin;
+class HexDigest {
+    async response(response) {
+        let body = await response.arrayBuffer();
+        return this.buffer(body);
     }
-    async fetch(request, url) {
-        return fetchLocal(request);
+    // https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
+    async buffer(buffer) {
+        const hashBuffer = await crypto.subtle.digest("SHA-256", buffer); // hash the message
+        const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
+        const hashHex = hashArray.map((b)=>b.toString(16).padStart(2, "0")
+        ).join(""); // convert bytes to hex string
+        return hashHex;
     }
 }
-const FETCH_LOCAL = new LocalFetchManager();
-async function fetchLocal(request) {
+const DIGEST = new HexDigest();
+async function fetchLocal(request, url, manifest) {
+    // slice off the leading `/`
+    let path = url.pathname.slice(1);
+    let localCache = await LOCAL_CACHE;
+    // If the path is in the manifest, we'll use the manifest digest information to invalidate the
+    // cache. Otherwise, don't cache the assets at all, and let them be downloaded again on every fetch.
+    if (manifest.has(path)) {
+        let cachedResponse = await localCache.match(request);
+        if (cachedResponse === undefined) {
+            let response = await manifest.fetch(request, localCache);
+            if (response) return response;
+        } else {
+            let result = await manifest.validate(request, cachedResponse, localCache);
+            if (result) return result;
+            else // Otherwise, the file is no longer in the manifest, so it shouldn't be cached. But we still
+            // want to let it fall back to normal semantics, so don't reject.
+            await localCache.delete(request);
+        }
+    }
     let response = await fetch(request);
     return updatedResponse(response, {
         headers: {
@@ -93,7 +130,7 @@ async function fetchLocal(request) {
         }
     });
 }
-class LongevityFetchManager {
+class LongLivedFetchManager {
     matches(request, url) {
         if (FETCH_LOCAL.matches(request, url)) return false;
         let type = assetType(url.pathname);
@@ -116,8 +153,11 @@ class LongevityFetchManager {
         }
         return response;
     }
+    constructor(){
+        this.name = "long-lived";
+    }
 }
-const FETCH_LONG_LIVED = new LongevityFetchManager();
+const FETCH_LONG_LIVED = new LongLivedFetchManager();
 function assetType(path) {
     if (path.endsWith(".ttf") || path.endsWith(".woff2")) return "font";
     if (path.endsWith(".wasm")) return "wasm";
@@ -134,6 +174,9 @@ class SkypackFetchManager {
         if (!match) throw Error(`fetchSkypack was unexpected called with an invalid Skypack URL (${href})`);
         let { pkg , version  } = match.groups;
         return PACKAGES.get(pkg, version);
+    }
+    constructor(){
+        this.name = "skypack";
     }
 }
 const FETCH_SKYPACK = new SkypackFetchManager();
@@ -209,6 +252,9 @@ class WasmFetchManager {
         }
         return response;
     }
+    constructor(){
+        this.name = "wasm";
+    }
 }
 const FETCH_WASM = new WasmFetchManager();
 async function wasm() {
@@ -217,53 +263,111 @@ async function wasm() {
     return bootWASM();
 }
 let WASM = null;
-class LoadingManifest {
-    async index() {
-        return this.indexResponse;
+async function transform(source, opts) {
+    if (WASM === null) WASM = wasm();
+    let { transform: transform1  } = await WASM;
+    return transform1(source, opts);
+}
+class TypescriptFetchManager {
+    matches(request, url) {
+        return url.pathname.endsWith(".ts");
     }
-    async entries() {
-        let entries = await this.manifest;
-        return new Manifest(entries);
+    async fetch(request, url, manifest) {
+        let response = await fetchLocal(request, url, manifest);
+        let string = await response.text();
+        let transpiled = await transform(string);
+        if (typeof transpiled === "string") throw Error(`Compilation error: ${transpiled}`);
+        return updatedResponse(response, {
+            body: transpiled.code,
+            headers: {
+                "Content-Type": "application/javascript"
+            }
+        });
     }
-    constructor(manifest, indexResponse){
-        this.manifest = manifest;
-        this.indexResponse = indexResponse;
+    constructor(){
+        this.name = "typescript";
     }
 }
+const FETCH_TS = new TypescriptFetchManager();
 class Manifest {
-    static load({ indexRequest , manifestURL  }) {
-        let manifest1 = fetchManifest(manifestURL);
-        let index = fetch(indexRequest);
-        return new LoadingManifest(manifest1, index);
+    static async load(manifestURL, clientId) {
+        let entries = await fetchManifest(manifestURL);
+        return new Manifest(entries, clientId);
+    }
+    get entries() {
+        return [
+            ...Object.keys(this.manifest)
+        ];
     }
     has(path) {
         return path in this.manifest;
     }
-    constructor(manifest1){
-        this.manifest = manifest1;
+    digest(url) {
+        return this.manifest[url.pathname.slice(1)]?.hash;
+    }
+    async isDigestValid(url, response) {
+        let cachedDigest = await DIGEST.response(response.clone());
+        let expectedDigest = this.digest(url);
+        return cachedDigest === expectedDigest;
+    }
+    async validate(request, response, cache) {
+        ENV.trace("cache", `checking cache for file in manifest (${request.url})`);
+        ENV.trace("verbose", {
+            manifest: this.manifest,
+            clientId: this.clientId
+        });
+        let valid = await this.isDigestValid(new URL(request.url), response);
+        if (valid) {
+            ENV.trace("cache", `cache hit (${request.url})`);
+            return response;
+        }
+        ENV.trace("cache", `manifest invalidated cache for ${request.url}`);
+        return await this.fetch(request, cache);
+    }
+    async fetch(request, cache) {
+        let path = new URL(request.url).pathname.slice(1);
+        let entry = this.manifest[path];
+        if (entry === undefined) return;
+        let fetchResponse = await fetch(request, {
+            cache: "reload"
+        });
+        let responseDigest = await DIGEST.response(fetchResponse.clone());
+        let expectedDigest = entry.hash;
+        if (responseDigest === expectedDigest) {
+            cache.put(request, fetchResponse.clone());
+            return fetchResponse.clone();
+        } else if (responseDigest !== expectedDigest) {
+            ENV.trace("error", `response for ${path} didn't match the digest from the manifest\n\nexpected: ${expectedDigest}\ngot     : ${responseDigest}`);
+            // The user needs to reload, because the file has been updated since the manifest was
+            // retrieved at the beginning of this navigation. TODO: automate and consider semantics.
+            return Response.error();
+        }
+    }
+    constructor(manifest2, clientId2){
+        this.manifest = manifest2;
+        this.clientId = clientId2;
     }
 }
 async function fetchManifest(url) {
-    let response = await fetch(url.href);
+    let response = await fetch(url.href, {
+        cache: "reload"
+    });
     return response.json();
 }
 class AppInstanceImpl {
-    index() {
-        return this.indexResponse;
-    }
-    constructor(manifest2, indexResponse1){
-        this.manifest = manifest2;
-        this.indexResponse = indexResponse1;
+    constructor(manifest1, clientId1){
+        this.manifest = manifest1;
+        this.clientId = clientId1;
     }
 }
 class InstalledServiceWorkerManagerImpl {
+    async connect(state, clientId) {
+        ENV.trace("state", "connect");
+        let manifest2 = await Manifest.load(this.manifestURL, clientId);
+        return new AppInstanceImpl(manifest2, clientId);
+    }
     async navigate(state, request) {
-        let loading = Manifest.load({
-            indexRequest: request,
-            manifestURL: this.manifestURL
-        });
-        let manifest3 = await loading.entries();
-        return new AppInstanceImpl(manifest3, loading.indexResponse);
+        return fetch(request);
     }
     constructor(fetchManagers, manifestURL){
         this.fetchManagers = fetchManagers;
@@ -286,20 +390,49 @@ class AppInstances {
         return this.installed.get(sw);
     }
     async getWindowClient(id) {
-        let client = await this.sw.clients.get(id);
+        let client = await this.swGlobal.clients.get(id);
         if (client === undefined || client.type !== "window") return;
         return client;
     }
-    async addAppInstance(client, instancePromise) {
-        let instance = await instancePromise;
-        if (this.instances.has(client)) throw Error(`addAppInstance should only be called once per SW client`);
-        this.instances.set(client, instance);
+    async gcClients() {
+        let allClients = await this.swGlobal.clients.matchAll({
+            type: "window"
+        });
+        let ids = new Set(allClients.map((c)=>c.id
+        ));
+        let instances = new Map();
+        for (let [key, value] of this.instances)if (ids.has(key)) instances.set(key, value);
+        this.instances = instances;
+    }
+    async addAppInstance(clientId, instancePromise) {
+        let [instance] = await Promise.all([
+            instancePromise,
+            this.gcClients()
+        ]);
+        if (this.instances.has(clientId)) throw Error(`addAppInstance should only be called once per SW client`);
+        this.instances.set(clientId, instance);
         return instance;
     }
-    constructor(sw2){
-        this.sw = sw2;
+    async navigateAppInstance(clientId, connect) {
+        await this.gcClients();
+        let instance = this.instances.get(clientId);
+        if (instance) throw Error(`ASSUMPTION ERROR: clientId already mapped onto an instance during navigation (clientId: ${clientId})`);
+        instance = await connect(clientId);
+        this.instances.set(clientId, instance);
+    }
+    async getAppInstance(clientId, connect) {
+        await this.gcClients();
+        let instance = this.instances.get(clientId);
+        if (!instance) {
+            instance = await connect(clientId);
+            this.instances.set(clientId, instance);
+        }
+        return instance;
+    }
+    constructor(swGlobal){
+        this.swGlobal = swGlobal;
         this.installed = new WeakMap();
-        this.instances = new WeakMap();
+        this.instances = new Map();
     }
 }
 class ServiceWorkerInstance {
@@ -314,6 +447,9 @@ class DefaultFetchManager {
     }
     fetch(request) {
         return fetch(request);
+    }
+    constructor(){
+        this.name = "default";
     }
 }
 const DEFAULT_FETCH_MANAGER = new DefaultFetchManager();
@@ -334,53 +470,79 @@ class FetchManagers {
         for (let manager2 of this.fetchManagers)if (manager2.matches(request, url)) return manager2;
         return this.defaultManager;
     }
+    async fetch(request, url, manifest) {
+        let manager2 = this.match(request, url);
+        let response = await manager2.fetch(request, url, manifest);
+        if (response.status === 0) return response;
+        return updatedResponse(response, {
+            headers: {
+                "X-Fetch-Manager": manager2.name,
+                "Cache-Control": "no-cache"
+            }
+        });
+    }
     constructor(fetchManagers1, defaultManager = new DefaultFetchManager()){
         this.fetchManagers = fetchManagers1;
         this.defaultManager = defaultManager;
     }
 }
-function initializeSW(sw2, manager2) {
-    const STATE = ServiceWorkerStateImpl.of(sw2);
-    sw2.addEventListener("install", (e)=>{
+function initializeSW(swGlobal1, manager2) {
+    const STATE = ServiceWorkerStateImpl.of(swGlobal1);
+    swGlobal1.addEventListener("install", (e)=>{
         const target = swFromEvent(e, "install");
         async function install() {
             ENV.trace("manager", "on:install start");
             await manager2.prefetch(STATE);
             let installed = await manager2.install(STATE, target);
             STATE.instances.setInstalled(target, installed);
-            if (manager2.skipWaiting) await sw2.skipWaiting();
+            if (manager2.skipWaiting) await swGlobal1.skipWaiting();
             ENV.trace("manager", "on:install end");
         }
         e.waitUntil(install());
     });
-    sw2.addEventListener("activate", (e)=>{
+    swGlobal1.addEventListener("activate", (e)=>{
         async function activate() {
             ENV.trace("manager", "on:activate start");
             if (manager2.skipWaiting) {
                 ENV.trace("manager", "on:activate waiting for clients.claim");
-                await sw2.clients.claim();
+                await swGlobal1.clients.claim();
             }
             ENV.trace("manager", "on:activate end");
         }
         e.waitUntil(activate());
     });
-    sw2.addEventListener("fetch", (e)=>{
-        const sw11 = swFromEvent(e, "fetch");
+    swGlobal1.addEventListener("fetch", (e)=>{
+        const sw1 = swFromEvent(e, "fetch");
         const request = e.request;
         e.respondWith(handleFetch());
         async function handleFetch() {
-            let installed = await STATE.instances.connect(manager2, sw11, STATE);
-            if (request.mode === "navigate") return handleNavigation(installed);
+            let installed = await STATE.instances.connect(manager2, sw1, STATE);
+            if (request.mode === "navigate") {
+                ENV.trace("state", "navigate", {
+                    clientId: e.resultingClientId
+                });
+                let connectPromise = STATE.instances.navigateAppInstance(e.resultingClientId, (id)=>installed.connect(STATE, id)
+                );
+                let [_connect, response] = await Promise.all([
+                    connectPromise,
+                    handleNavigation(installed), 
+                ]);
+                return response;
+            }
+            ENV.trace("state", "fetch", {
+                clientId: e.clientId,
+                url: request.url
+            });
+            let instance = await STATE.instances.getAppInstance(e.clientId, (id)=>installed.connect(STATE, id)
+            );
             let url = new URL(request.url);
-            let fetchManager = installed.fetchManagers.match(request, url);
-            return fetchManager.fetch(request, url);
+            return installed.fetchManagers.fetch(request, url, instance.manifest);
         }
         async function handleNavigation(installed) {
             // let client = await STATE.instances.getWindowClient(e.clientId);
-            let navigation = installed.navigate(STATE, request);
-            let instance = await navigation;
-            // let instance = await STATE.instances.addAppInstance(client, navigation);
-            return instance.index(new URL(request.url));
+            let navigation = await installed.navigate(STATE, request);
+            await swGlobal1.clients.claim();
+            return navigation;
         }
     });
 }
@@ -393,7 +555,7 @@ class ServiceWorkerStateImpl {
         this.instances = instances;
     }
 }
-const FETCH_MANAGERS = FetchManagers.default().add(FETCH_WASM, FETCH_SKYPACK, FETCH_LONG_LIVED, FETCH_LOCAL);
+const FETCH_MANAGERS = FetchManagers.default().add(FETCH_WASM, FETCH_SKYPACK, FETCH_LONG_LIVED, FETCH_TS, FETCH_LOCAL);
 class ServiceWorkerManagerImpl {
     async prefetch() {
         await wasm();
@@ -404,8 +566,8 @@ class ServiceWorkerManagerImpl {
     async connect(state, sw) {
         return new InstalledServiceWorkerManagerImpl(FETCH_MANAGERS, new URL("/dev.json", origin));
     }
-    constructor(sw3){
-        this.sw = sw3;
+    constructor(sw2){
+        this.sw = sw2;
         this.skipWaiting = true;
     }
 }
@@ -424,8 +586,8 @@ function assertServiceWorkerEventTarget(target, name) {
     } else throw Error(`ASSUMPTION ERROR: e.target in a service worker event (${name}) did not have a serviceWorker property`);
 }
 async function boot() {
-    const sw4 = self;
+    const sw3 = self;
     ENV.trace("top-level", "top level");
-    initializeSW(sw4, new ServiceWorkerManagerImpl(sw4));
+    initializeSW(sw3, new ServiceWorkerManagerImpl(sw3));
 }
 boot();

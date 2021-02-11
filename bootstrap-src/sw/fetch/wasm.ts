@@ -6,6 +6,8 @@ import { FetchManager } from "../manager/interfaces";
 const WASM_CACHE = caches.open("swc.wasm");
 
 export class WasmFetchManager implements FetchManager {
+  readonly name = "wasm";
+
   matches(request: Request, url: URL): boolean {
     return url.pathname === "/bootstrap/swc.wasm";
   }

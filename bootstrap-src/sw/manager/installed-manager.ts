@@ -1,5 +1,6 @@
+import { ENV } from "../env";
 import { Manifest } from "../manifest";
-import { AppInstanceImpl } from "./fetch-manager";
+import { AppInstance, AppInstanceImpl } from "./fetch-manager";
 import {
   FetchManagers,
   InstalledServiceWorkerManager,
@@ -13,14 +14,20 @@ export class InstalledServiceWorkerManagerImpl
     readonly manifestURL: URL
   ) {}
 
-  async navigate(state: ServiceWorkerManagerState, request: Request) {
-    let loading = Manifest.load({
-      indexRequest: request,
-      manifestURL: this.manifestURL,
-    });
+  async connect(
+    state: ServiceWorkerManagerState,
+    clientId: string
+  ): Promise<AppInstance> {
+    ENV.trace("state", "connect");
+    let manifest = await Manifest.load(this.manifestURL, clientId);
 
-    let manifest = await loading.entries();
+    return new AppInstanceImpl(manifest, clientId);
+  }
 
-    return new AppInstanceImpl(manifest, loading.indexResponse);
+  async navigate(
+    state: ServiceWorkerManagerState,
+    request: Request
+  ): Promise<Response> {
+    return fetch(request);
   }
 }

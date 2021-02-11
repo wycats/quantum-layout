@@ -2,7 +2,7 @@ import { ENV } from "../env";
 import { FETCH_LOCAL } from "../fetch/local";
 import { FETCH_LONG_LIVED } from "../fetch/long-lived";
 import { FETCH_SKYPACK } from "../fetch/skypack";
-import { TS } from "../fetch/typescript";
+import { FETCH_TS } from "../fetch/typescript";
 import { FETCH_WASM, wasm } from "../fetch/wasm";
 import { InstalledServiceWorkerManagerImpl } from "./installed-manager";
 import { AppInstances } from "./instances";
@@ -14,12 +14,12 @@ import {
 } from "./interfaces";
 
 export function initializeSW(
-  sw: ServiceWorkerGlobalScope,
+  swGlobal: ServiceWorkerGlobalScope,
   manager: ServiceWorkerManager
 ) {
-  const STATE = ServiceWorkerStateImpl.of(sw);
+  const STATE = ServiceWorkerStateImpl.of(swGlobal);
 
-  sw.addEventListener("install", (e) => {
+  swGlobal.addEventListener("install", (e) => {
     const target = swFromEvent(e, "install");
 
     async function install() {
@@ -30,7 +30,7 @@ export function initializeSW(
       STATE.instances.setInstalled(target, installed);
 
       if (manager.skipWaiting) {
-        await sw.skipWaiting();
+        await swGlobal.skipWaiting();
       }
 
       ENV.trace("manager", "on:install end");
@@ -39,13 +39,13 @@ export function initializeSW(
     e.waitUntil(install());
   });
 
-  sw.addEventListener("activate", (e) => {
+  swGlobal.addEventListener("activate", (e) => {
     async function activate() {
       ENV.trace("manager", "on:activate start");
 
       if (manager.skipWaiting) {
         ENV.trace("manager", "on:activate waiting for clients.claim");
-        await sw.clients.claim();
+        await swGlobal.clients.claim();
       }
 
       ENV.trace("manager", "on:activate end");
@@ -54,7 +54,7 @@ export function initializeSW(
     e.waitUntil(activate());
   });
 
-  sw.addEventListener("fetch", (e) => {
+  swGlobal.addEventListener("fetch", (e) => {
     const sw = swFromEvent(e, "fetch");
     const request = e.request;
 
@@ -64,27 +64,40 @@ export function initializeSW(
       let installed = await STATE.instances.connect(manager, sw, STATE);
 
       if (request.mode === "navigate") {
-        return handleNavigation(installed);
+        ENV.trace("state", "navigate", { clientId: e.resultingClientId });
+        let connectPromise = STATE.instances.navigateAppInstance(
+          e.resultingClientId,
+          (id) => installed.connect(STATE, id)
+        );
+
+        let [_connect, response] = await Promise.all([
+          connectPromise,
+          handleNavigation(installed),
+        ]);
+        return response;
+        // return handleNavigation(installed);
       }
 
+      ENV.trace("state", "fetch", {
+        clientId: e.clientId,
+        url: request.url,
+      });
+
+      let instance = await STATE.instances.getAppInstance(e.clientId, (id) =>
+        installed.connect(STATE, id)
+      );
+
       let url = new URL(request.url);
-      let fetchManager = installed.fetchManagers.match(request, url);
-      return fetchManager.fetch(request, url);
+      return installed.fetchManagers.fetch(request, url, instance.manifest);
     }
 
     async function handleNavigation(installed: InstalledServiceWorkerManager) {
       // let client = await STATE.instances.getWindowClient(e.clientId);
-      let navigation = installed.navigate(STATE, request);
-      let instance = await navigation;
-      // let instance = await STATE.instances.addAppInstance(client, navigation);
-      return instance.index(new URL(request.url));
+      let navigation = await installed.navigate(STATE, request);
 
-      // if (client) {
-      // } else {
-      //   throw new Error(
-      //     `unexpectedly missing serviceWorker.clients.get(${e.clientId})`
-      //   );
-      // }
+      await swGlobal.clients.claim();
+
+      return navigation;
     }
   });
 }
@@ -102,6 +115,7 @@ const FETCH_MANAGERS = FetchManagers.default().add(
   FETCH_WASM,
   FETCH_SKYPACK,
   FETCH_LONG_LIVED,
+  FETCH_TS,
   FETCH_LOCAL
 );
 

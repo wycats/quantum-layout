@@ -1,3 +1,5 @@
+import { updatedResponse } from "../fetch/utils";
+import { Manifest } from "../manifest";
 import { AppInstance } from "./fetch-manager";
 import { AppInstances } from "./instances";
 
@@ -29,6 +31,8 @@ export interface ServiceWorkerManager {
 }
 
 export class DefaultFetchManager implements FetchManager {
+  readonly name = "default";
+
   matches(): boolean {
     return true;
   }
@@ -61,7 +65,7 @@ export class FetchManagers {
     return new FetchManagers(this.fetchManagers, manager);
   }
 
-  match(request: Request, url: URL): FetchManager {
+  private match(request: Request, url: URL): FetchManager {
     for (let manager of this.fetchManagers) {
       if (manager.matches(request, url)) {
         return manager;
@@ -70,18 +74,41 @@ export class FetchManagers {
 
     return this.defaultManager;
   }
+
+  async fetch(
+    request: Request,
+    url: URL,
+    manifest: Manifest
+  ): Promise<Response> {
+    let manager = this.match(request, url);
+    let response = await manager.fetch(request, url, manifest);
+
+    if (response.status === 0) {
+      return response;
+    }
+
+    return updatedResponse(response, {
+      headers: { "X-Fetch-Manager": manager.name, "Cache-Control": "no-cache" },
+    });
+  }
 }
 
 export interface InstalledServiceWorkerManager {
   readonly fetchManagers: FetchManagers;
 
+  connect(
+    state: ServiceWorkerManagerState,
+    clientId: string
+  ): Promise<AppInstance>;
+
   navigate(
     state: ServiceWorkerManagerState,
-    request: Request
-  ): Promise<AppInstance>;
+    clientId: Request
+  ): Promise<Response>;
 }
 
 export interface FetchManager {
+  readonly name: string;
   matches(request: Request, url: URL): boolean;
-  fetch(request: Request, url: URL): Promise<Response>;
+  fetch(request: Request, url: URL, manifest: Manifest): Promise<Response>;
 }

@@ -1,10 +1,10 @@
 {
   "sw.js": {
     "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/sw.js",
-    "hash": "f7818173193126b7ca4e088de46d897f04d3cc5700eab091166b9d8fcb55a14f"
+    "hash": "2ce942b2060181d11424abdef11a3671066bd6f84c1c988907d9b09b3960be94"
   },
   "main.js": {
     "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/main.js",
-    "hash": "da233df54857a3ed54cf3f897f5becf85d9383494651a0a7b8eaaed248c41113"
+    "hash": "3ada867853228a25b2574c3fb98c2788f8ba26b3fe902af25cf35c445f8b7004"
   }
 }
