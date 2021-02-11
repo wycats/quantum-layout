@@ -2,7 +2,7 @@
   "compilerOptions": {
     "allowJs": true,
     "target": "es2019",
-    "module": "es2020",
+    "module": "esnext",
     "lib": ["ESNext", "DOM", "DOM.Iterable", "WebWorker"],
     "noEmit": true,
     "isolatedModules": true,
@@ -22,5 +22,10 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*.ts", "bootstrap-src/**/*.ts", "types/**/*.d.ts"]
+  "include": [
+    "src/**/*.ts",
+    "bootstrap-src/**/*.ts",
+    "types/**/*.d.ts",
+    "scripts/*.mjs"
+  ]
 }

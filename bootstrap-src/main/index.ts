@@ -7,9 +7,6 @@ async function boot() {
 
     await App.boot();
 
-    // const { hello } = await import("./app/hello");
-    // console.log(hello());
-
     document.body.classList.replace("rendered:loading", "rendered:loaded");
   } catch (e) {
     document.body.classList.replace("rendered:loading", "rendered:error");

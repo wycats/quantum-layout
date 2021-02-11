@@ -54,7 +54,7 @@ function traceArgs(args) {
         };
     }
 }
-const ENV = Environment.default("\u{1f9d9}").enable("*").icon("page", "\u{1f4c3}").icon("state:pending", "\u231b").icon("state:update", "\u{1f440}").icon("state:active", "\u2705").icon("state:done", "\u{1f3c1}").icon("state:error", "\u26d4").icon("state:reload", "\u{1f504}").icon("state:transition", "\u231b");
+const ENV = Environment.default("\u{1f9d9}").icon("page", "\u{1f4c3}").icon("state:pending", "\u231b").icon("state:update", "\u{1f440}").icon("state:active", "\u2705").icon("state:done", "\u{1f3c1}").icon("state:error", "\u26d4").icon("state:reload", "\u{1f504}").icon("state:transition", "\u231b").enable("state:error");
 async function registerSW() {
     if ("serviceWorker" in navigator) {
         let sw = navigator.serviceWorker;
@@ -67,7 +67,6 @@ async function registerSW() {
             ENV.trace("page", "ready", reg.scope);
             if (sw.controller) {
                 var url = sw.controller.scriptURL;
-                // console.log('serviceWorker.controller', url);
                 ENV.trace("state:active", {
                     controller: true,
                     url
@@ -94,8 +93,6 @@ async function boot() {
         await SW;
         const { App  } = await import("../bootstrap/app.js");
         await App.boot();
-        // const { hello } = await import("./app/hello");
-        // console.log(hello());
         document.body.classList.replace("rendered:loading", "rendered:loaded");
     } catch (e) {
         document.body.classList.replace("rendered:loading", "rendered:error");

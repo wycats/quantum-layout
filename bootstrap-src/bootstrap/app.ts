@@ -130,7 +130,6 @@ export class App {
   static async initializeSources(): Promise<readonly Source[]> {
     await FS.mkdirParents(ROOT);
     let files = await FS.ls(ROOT);
-    console.log(ROOT, files);
 
     if (files.length === 0) {
       for (let source of DEFAULT_SOURCES) {

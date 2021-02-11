@@ -1,29 +1,38 @@
-import { ENV } from "./env";
+import { ENV } from "../env";
+import { FetchManager } from "../manager/interfaces";
+
+class SkypackFetchManager implements FetchManager {
+  matches(request: Request, url: URL): boolean {
+    return (
+      url.hostname === "cdn.skypack.dev" && !url.pathname.startsWith("/-/")
+    );
+  }
+
+  fetch(request: Request, { pathname, href }: URL): Promise<Response> {
+    if (pathname.startsWith("/-/")) {
+      return fetch(request);
+    }
+
+    let match = pathname.match(/^\/(?<pkg>@?[^@]*)@(?<version>.*)$/);
+
+    if (!match) {
+      throw Error(
+        `fetchSkypack was unexpected called with an invalid Skypack URL (${href})`
+      );
+    }
+
+    let { pkg, version } = match.groups as { pkg: string; version: string };
+
+    return PACKAGES.get(pkg, version);
+  }
+}
+
+export const FETCH_SKYPACK = new SkypackFetchManager();
 
 export function isSkypack(request: Request): boolean {
   let url = new URL(request.url);
 
   return url.hostname === "cdn.skypack.dev" && !url.pathname.startsWith("/-/");
-}
-
-export function fetchSkypack(request: Request): Promise<Response> {
-  let { pathname, href } = new URL(request.url);
-
-  if (pathname.startsWith("/-/")) {
-    return fetch(request);
-  }
-
-  let match = pathname.match(/^\/(?<pkg>@?[^@]*)@(?<version>.*)$/);
-
-  if (!match) {
-    throw Error(
-      `fetchSkypack was unexpected called with an invalid Skypack URL (${href})`
-    );
-  }
-
-  let { pkg, version } = match.groups as { pkg: string; version: string };
-
-  return PACKAGES.get(pkg, version);
 }
 
 class Package {
@@ -47,10 +56,10 @@ class Package {
             redirect: "follow",
           });
           let response = await fetch(request, { redirect: "follow" });
-          ENV.trace(true, "fetch", "skypack response", response);
+          ENV.trace("fetch", "skypack response", response);
 
           if (response.status < 200 || response.status >= 300) {
-            ENV.trace(true, "error", `response was not 2xx`, response);
+            ENV.trace("error", `response was not 2xx`, response);
             reject(
               Error(
                 `unexpected status (${response.status}) from Skypack (${url})`
@@ -77,7 +86,8 @@ class Package {
     let match = await c.match(url);
 
     if (!match) {
-      throw Error(`Unexpected URL missing in package cache: ${url}`);
+      delete this.versions[version];
+      return this.get(version);
     }
 
     return match;
@@ -94,8 +104,6 @@ class Packages {
       pkg = new Package(name);
       this.packages[name] = pkg;
     }
-
-    console.log("PKG", pkg, version);
 
     return pkg.get(version);
   }

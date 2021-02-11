@@ -1,6 +1,18 @@
 {
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[shellscript]": {
+    "files.eol": "\n",
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/*.code-search": true,
+    "public/**/*.js": true,
+    "public/*.js": true,
+    "scripts/*.js": true
+  },
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,

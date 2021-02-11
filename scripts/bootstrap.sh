@@ -3,29 +3,84 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-echo "* cleaning up"
-rm -f public/{main,sw}.js
+ROOT=$(realpath $(dirname $BASH_SOURCE)/..)
 
-rm -f ./public/bootstrap/*
-mkdir -p ./public/bootstrap
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
 
-rm -rf ./public/app/
-mkdir -p ./public/app
+function header() {
+  echo -e "${BLUE}$1${NC}"
+}
 
-rm ./scripts/manifest.js
+function step() {
+  echo -e "  ✅ ${2:-$NC}$1${NC}"
+}
 
-echo "* copying swc.wasm"
-cp ./bootstrap-src/bootstrap/swc.wasm ./public/bootstrap/swc.wasm
-echo "* stripping bootstrap types -> vanilla"
-swc -c ./.swcrc -d ./public/bootstrap -s inline ./bootstrap-src/bootstrap/*.ts
-echo "* bundling"
-echo "  - main.ts"
-TO_BUNDLE=main spack 1>/dev/null
-echo "  - sw.ts"
-TO_BUNDLE=sw spack 1>/dev/null
-echo "  - scripts/manifest.ts"
-TO_BUNDLE=manifest spack 1>/dev/null
-echo "* copying"
-echo "  -  src/... -> public/app/..."
-cp -R src/* public/app/
+function cleanup() {
+  local DELETED=false
 
+  for FILE in $@; do
+    if [[ -f "$FILE" ]]; then
+      DELETED=true
+      RELATIVE=$(realpath --relative-to="$ROOT" "$FILE")
+      step "$RELATIVE"
+      # rm $FILE
+    fi
+  done
+
+  if [[ $DELETED = false ]]; then
+    echo -e "  ${GREEN}no files to delete${NC}"
+  fi
+}
+
+header "cleaning up"
+
+cleanup $ROOT/public/{main,sw}.js $ROOT/scripts/*.js $ROOT/public/bootstrap/*.js
+
+header "compiling bootstrap bundler"
+
+for FILE in $(ls $ROOT/bootstrap-src/manifest/*); do
+  BASENAME=$(basename $FILE)
+  HEAD=${BASENAME%.ts}
+  step "manifest/$BASENAME -> scripts/$HEAD.js"
+  swc $FILE -o $ROOT/scripts/$HEAD.js
+done
+
+header "building manifest (bundling)"
+
+step "node $ROOT/scripts/index.js"
+
+node $ROOT/scripts/index.js
+
+header "copying bootstrap files (temporary)"
+
+for FILE in $(ls $ROOT/bootstrap-src/bootstrap/*.ts); do
+  BASENAME=$(basename $FILE)
+  HEAD=${BASENAME%.ts}
+  step "bootstrap/$BASENAME -> public/bootstrap/$HEAD.js"
+  swc $FILE -o $ROOT/public/bootstrap/$HEAD.js
+done
+
+# echo "  - public/{main,sw}.js"
+
+# rm -f public/{main,sw}.js
+
+# for FILE in $(ls $ROOT/bootstrap-src/manifest/*); do
+#   BASENAME=$(basename $FILE)
+#   HEAD=${BASENAME%.ts}
+
+#   echo "  - $scripts/$HEAD.mjs"
+#   rm -f $ROOT/scripts/$HEAD.mjs
+# done
+
+# MANIFEST=$ROOT/bootstrap-src/manifest/index.ts
+
+# for FILE in $(ls $ROOT/bootstrap-src/manifest/*); do
+#   BASENAME=$(basename $FILE)
+#   HEAD=${BASENAME%.ts}
+#   echo "* manifest/$BASENAME -> scripts/$HEAD.mjs"
+#   # swc $FILE -o $ROOT/scripts/$BASENAME.mjs
+# # echo "* scripts/manifest.js"
+
+# done

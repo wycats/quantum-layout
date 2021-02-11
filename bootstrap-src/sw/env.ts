@@ -1,9 +1,10 @@
 import { Environment } from "../bootstrap/env.js";
 
-const CATEGORIES = ["top-level", "fetch", "cache", "state", "error"];
+const CATEGORIES = ["top-level", "fetch", "cache", "state", "error", "manager"];
 type Category = typeof CATEGORIES[number];
 
-export const ENV = Environment.default<Category>("🧙").enable("state", "cache");
+export const ENV = Environment.default<Category>("🧙").enable("manager");
+//.enable("state","cache");
 
 export function addingHeaders(
   original: Headers,

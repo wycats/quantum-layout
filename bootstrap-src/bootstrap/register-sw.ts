@@ -11,7 +11,6 @@ const CATEGORIES = [
 type Category = typeof CATEGORIES[number];
 
 const ENV = Environment.default<Category>("🧙")
-  .enable("*")
   .icon("page", "📃")
   .icon("state:pending", "⌛")
   .icon("state:update", "👀")
@@ -19,7 +18,8 @@ const ENV = Environment.default<Category>("🧙")
   .icon("state:done", "🏁")
   .icon("state:error", "⛔")
   .icon("state:reload", "🔄")
-  .icon("state:transition", "⌛");
+  .icon("state:transition", "⌛")
+  .enable("state:error");
 
 async function registerSW(): Promise<ServiceWorker> {
   if ("serviceWorker" in navigator) {
@@ -38,7 +38,6 @@ async function registerSW(): Promise<ServiceWorker> {
 
       if (sw.controller) {
         var url = sw.controller.scriptURL;
-        // console.log('serviceWorker.controller', url);
         ENV.trace("state:active", { controller: true, url });
         return sw.controller;
       } else {
