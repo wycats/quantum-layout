@@ -2,7 +2,7 @@ import { ENV } from "../env";
 import { FETCH_LOCAL } from "../fetch/local";
 import { FETCH_LONG_LIVED } from "../fetch/long-lived";
 import { FETCH_SKYPACK } from "../fetch/skypack";
-import { FETCH_TS } from "../fetch/typescript";
+import { TypescriptFetchManager } from "../fetch/typescript";
 import { FETCH_WASM, wasm } from "../fetch/wasm";
 import { InstalledServiceWorkerManagerImpl } from "./installed-manager";
 import { AppInstances } from "./instances";
@@ -115,7 +115,10 @@ const FETCH_MANAGERS = FetchManagers.default().add(
   FETCH_WASM,
   FETCH_SKYPACK,
   FETCH_LONG_LIVED,
-  FETCH_TS,
+  new TypescriptFetchManager((url) => {
+    console.log(url.pathname, url.pathname.startsWith("/bootstrap/"));
+    return url.pathname.startsWith("/bootstrap/");
+  }),
   FETCH_LOCAL
 );
 

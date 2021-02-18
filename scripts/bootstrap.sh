@@ -36,7 +36,7 @@ function cleanup() {
 
 header "cleaning up"
 
-cleanup $ROOT/public/{main,sw}.js $ROOT/scripts/*.js $ROOT/public/bootstrap/*.js
+cleanup $ROOT/public/{main,sw}.js $ROOT/public/main.ts $ROOT/scripts/*.js $ROOT/public/bootstrap/*.ts
 
 header "compiling bootstrap bundler"
 
@@ -44,8 +44,11 @@ for FILE in $(ls $ROOT/bootstrap-src/manifest/*); do
   BASENAME=$(basename $FILE)
   HEAD=${BASENAME%.ts}
   step "manifest/$BASENAME -> scripts/$HEAD.js"
-  swc $FILE -o $ROOT/scripts/$HEAD.js
+  ./node_modules/.bin/swc $FILE -o $ROOT/scripts/$HEAD.js
 done
+
+step "bootstrap/wasm.ts -> public/bootstrap/wasm.js"
+./node_modules/.bin/swc $ROOT/bootstrap-src/bootstrap/wasm.ts -o $ROOT/public/bootstrap/wasm.js
 
 header "building manifest (bundling)"
 
@@ -55,11 +58,15 @@ node $ROOT/scripts/index.js
 
 header "copying bootstrap files (temporary)"
 
+step "main.ts -> public/main.ts"
+cp $ROOT/bootstrap-src/main.js public/main.js
+
 for FILE in $(ls $ROOT/bootstrap-src/bootstrap/*.ts); do
   BASENAME=$(basename $FILE)
   HEAD=${BASENAME%.ts}
-  step "bootstrap/$BASENAME -> public/bootstrap/$HEAD.js"
-  swc $FILE -o $ROOT/public/bootstrap/$HEAD.js
+  step "bootstrap/$BASENAME -> public/bootstrap/$BASENAME"
+  cp $FILE $ROOT/public/bootstrap/
+  # swc $FILE -o $ROOT/public/bootstrap/$HEAD.js
 done
 
 # echo "  - public/{main,sw}.js"

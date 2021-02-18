@@ -29,6 +29,20 @@ export async function fetchLocal(
   url: URL,
   manifest: Manifest
 ): Promise<Response> {
+  let response = await fetchLocalFile(request, url, manifest);
+
+  if (response.ok) {
+    return response;
+  } else {
+    throw Error(`HTTP Request ${response.statusText} (${request.url})`);
+  }
+}
+
+async function fetchLocalFile(
+  request: Request,
+  url: URL,
+  manifest: Manifest
+): Promise<Response> {
   // slice off the leading `/`
   let path = url.pathname.slice(1);
   let localCache = await LOCAL_CACHE;

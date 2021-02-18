@@ -75,6 +75,11 @@ class LocalFetchManager {
     }
 }
 const FETCH_LOCAL = new LocalFetchManager();
+async function fetchLocal(request, url, manifest) {
+    let response = await fetchLocalFile(request, url, manifest);
+    if (response.ok) return response;
+    else throw Error(`HTTP Request ${response.statusText} (${request.url})`);
+}
 function updatedResponse(response, { body =response.body , status =response.status , statusText =response.statusText , headers: addHeaders , replaceHeaders  }) {
     let headers = replaceHeaders ? new Headers(replaceHeaders) : addingHeaders3(response.headers, addHeaders || {
     });
@@ -104,7 +109,7 @@ class HexDigest {
     }
 }
 const DIGEST = new HexDigest();
-async function fetchLocal(request, url, manifest) {
+async function fetchLocalFile(request, url, manifest) {
     // slice off the leading `/`
     let path = url.pathname.slice(1);
     let localCache = await LOCAL_CACHE;
@@ -270,9 +275,11 @@ async function transform(source, opts) {
 }
 class TypescriptFetchManager {
     matches(request, url) {
-        return url.pathname.endsWith(".ts");
+        return this.isMatch(url);
     }
-    async fetch(request, url, manifest) {
+    async fetch(originalRequest, originalURL, manifest) {
+        let url = new URL(`${originalURL.href}.ts`);
+        let request = new Request(url.href, originalRequest);
         let response = await fetchLocal(request, url, manifest);
         let string = await response.text();
         let transpiled = await transform(string);
@@ -284,11 +291,11 @@ class TypescriptFetchManager {
             }
         });
     }
-    constructor(){
+    constructor(isMatch){
+        this.isMatch = isMatch;
         this.name = "typescript";
     }
 }
-const FETCH_TS = new TypescriptFetchManager();
 class Manifest {
     static async load(manifestURL, clientId) {
         let entries = await fetchManifest(manifestURL);
@@ -555,7 +562,10 @@ class ServiceWorkerStateImpl {
         this.instances = instances;
     }
 }
-const FETCH_MANAGERS = FetchManagers.default().add(FETCH_WASM, FETCH_SKYPACK, FETCH_LONG_LIVED, FETCH_TS, FETCH_LOCAL);
+const FETCH_MANAGERS = FetchManagers.default().add(FETCH_WASM, FETCH_SKYPACK, FETCH_LONG_LIVED, new TypescriptFetchManager((url)=>{
+    console.log(url.pathname, url.pathname.startsWith("/bootstrap/"));
+    return url.pathname.startsWith("/bootstrap/");
+}), FETCH_LOCAL);
 class ServiceWorkerManagerImpl {
     async prefetch() {
         await wasm();

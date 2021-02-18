@@ -27,6 +27,7 @@
     "eslint": "^7.19.0",
     "eslint-import-resolver-typescript": "^2.3.0",
     "eslint-plugin-import": "^2.22.1",
+    "globby": "^11.0.2",
     "localforage": "^1.9.0",
     "rollup": "^2.38.5",
     "sass": "^1.32.7",

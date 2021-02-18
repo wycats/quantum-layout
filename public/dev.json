@@ -1,10 +1,38 @@
 {
   "sw.js": {
     "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/sw.js",
-    "hash": "2ce942b2060181d11424abdef11a3671066bd6f84c1c988907d9b09b3960be94"
+    "hash": "04a417b9eb00adaf77004ab2287408128929b3b375799a1c347c8dcf688d45aa"
   },
-  "main.js": {
-    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/main.js",
-    "hash": "3ada867853228a25b2574c3fb98c2788f8ba26b3fe902af25cf35c445f8b7004"
+  "register-sw.js": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/register-sw.js",
+    "hash": "ccefbb34d1bcf3110e0d75c7d9d04f19e19a3be045ab5efa3168081d25c214d6"
+  },
+  "bootstrap/app.ts": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/bootstrap-src/bootstrap/app.ts",
+    "hash": "b2dd329c1e0ea961f11f620d3ba2f59f3bb3421ab843d1347d98d323289a027c"
+  },
+  "bootstrap/dom.ts": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/bootstrap-src/bootstrap/dom.ts",
+    "hash": "9f2b323304805f42c2e162585f093e8acd0c218397496aeb20a7a369a80506a8"
+  },
+  "bootstrap/env.ts": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/bootstrap-src/bootstrap/env.ts",
+    "hash": "c285f25c1178af60fde9af06f494dabaf231f3f2bfd8ac089b1f5065aac4f455"
+  },
+  "bootstrap/index.ts": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/bootstrap-src/bootstrap/index.ts",
+    "hash": "4bd238f5a92ab42258811b86f532625d9a833a3420d9fe662020e0412990ba74"
+  },
+  "bootstrap/resize.ts": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/bootstrap-src/bootstrap/resize.ts",
+    "hash": "3c977553f8b204f08b83b4d826d76a90f67fec2e5acfbc1ebc64f97746e19390"
+  },
+  "bootstrap/result.ts": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/bootstrap-src/bootstrap/result.ts",
+    "hash": "33dad259095cb299c8266e916df6ebf34aca2505e7ffaf644f5e57c6b3426e8e"
+  },
+  "bootstrap/wasm.ts": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/bootstrap-src/bootstrap/wasm.ts",
+    "hash": "e5bf55021af8bb06dff25986992d8ef958762ac925c786e100cf6b7d3a3363c4"
   }
 }
