@@ -12,10 +12,12 @@ export class InstalledServiceWorkerManagerImpl
   constructor(
     readonly fetchManagers: FetchManagers,
     readonly manifestURL: URL
-  ) {}
+  ) {
+    console.log("manifestURL", manifestURL);
+  }
 
   async connect(
-    state: ServiceWorkerManagerState,
+    _state: ServiceWorkerManagerState,
     clientId: string
   ): Promise<AppInstance> {
     ENV.trace("state", "connect");
@@ -25,7 +27,7 @@ export class InstalledServiceWorkerManagerImpl
   }
 
   async navigate(
-    state: ServiceWorkerManagerState,
+    _state: ServiceWorkerManagerState,
     request: Request
   ): Promise<Response> {
     return fetch(request);

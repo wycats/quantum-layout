@@ -10,7 +10,7 @@
     "**/bower_components": true,
     "**/*.code-search": true,
     "public/**/*.js": true,
-    "public/*.js": true,
+    "public/*.js": false,
     "scripts/*.js": true
   },
   "files.exclude": {
@@ -20,6 +20,7 @@
     "**/CVS": true,
     "**/.DS_Store": true,
     "node_modules": true,
+    "public/**/*.ts": false,
     "public/**/*.js": false
   },
   "json.schemas": [

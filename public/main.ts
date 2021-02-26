@@ -1,11 +1,11 @@
-import { SW } from "../bootstrap/register-sw.js";
+import { SW } from "./bootstrap/register-sw.js";
 
 console.log("BYE!!");
 
 async function boot() {
   try {
     await SW;
-    const { App } = await import("../bootstrap/app.js");
+    const { App } = await import("./bootstrap/app.js");
 
     await App.boot();
 

@@ -1,7 +1,6 @@
 {
   "name": "Quantum Layout Demo",
   "short_name": "quantum",
-  "start_url": "/",
   "icons": [
     {
       "src": "/icons/android-chrome-192x192.png",

@@ -47,11 +47,8 @@ nav > div:not(:last-child) > button:first-child {
 button {
   --hue: 200;
   --button-fg: hsl(var(--hue), 100%, 50%);
-
   font-family: Recursive;
-
   display: grid;
-  height: 2em;
   align-content: center;
   transition-property: color, background-color, font-weight;
   transition-duration: 0.1s;
@@ -60,7 +57,10 @@ button {
   color: var(--button-fg);
   border: 1px solid var(--button-fg);
   font-weight: 400;
-  border-radius: 0.2rem;
+}
+
+button.icon {
+  border: none;
 }
 
 button:hover {

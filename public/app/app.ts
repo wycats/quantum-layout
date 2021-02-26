@@ -3,12 +3,12 @@
 import SimpleFS, {
   Stats,
 } from "https://cdn.skypack.dev/@forlagshuset/simple-fs@0.4.1";
-import { ElementFacade, FormDesc, FormFacade } from "./dom.js";
-import { boot } from "./index.js";
-import { Maybe, Result } from "./result.js";
+import { ElementFacade, FormDesc, FormFacade } from "./dom";
+import { boot } from "./boot";
+import { Maybe, Result } from "./result";
 import type * as swc from "@swc/core";
-import { bootObservers } from "./resize.js";
-import { SugaryExports } from "./wasm.js";
+import { bootObservers } from "./resize";
+import { SugaryExports } from "../bootstrap/wasm.js";
 
 const ELEMENTS = {
   form: {
@@ -232,7 +232,7 @@ export class App {
 
         let trashNav = new ElementFacade(
           el(
-            `<button aria-label="Delete Module"><i class="fa fa-trash" aria-hidden="true"></i></button>`
+            `<button class="icon" aria-label="Delete Module"><i class="fa fa-trash" aria-hidden="true"></i></button>`
           )
         ).on("click", () => {
           this.deleteSource(source);

@@ -2,7 +2,7 @@ import { ENV } from "../env";
 import { FETCH_LOCAL } from "../fetch/local";
 import { FETCH_LONG_LIVED } from "../fetch/long-lived";
 import { FETCH_SKYPACK } from "../fetch/skypack";
-import { FETCH_TS } from "../fetch/typescript";
+import { TypescriptFetchManager } from "../fetch/typescript";
 import { FETCH_WASM, wasm } from "../fetch/wasm";
 import { InstalledServiceWorkerManagerImpl } from "./installed-manager";
 import { AppInstances } from "./instances";
@@ -57,6 +57,9 @@ export function initializeSW(
   swGlobal.addEventListener("fetch", (e) => {
     const sw = swFromEvent(e, "fetch");
     const request = e.request;
+    const url = new URL(request.url);
+
+    // let handledFetch = handleFetch();
 
     e.respondWith(handleFetch());
 
@@ -83,9 +86,13 @@ export function initializeSW(
         url: request.url,
       });
 
+      ENV.trace("local", "await STATE.instances.getAppInstance", request.url);
+
       let instance = await STATE.instances.getAppInstance(e.clientId, (id) =>
         installed.connect(STATE, id)
       );
+
+      ENV.trace("local", "instance", request.url);
 
       let url = new URL(request.url);
       return installed.fetchManagers.fetch(request, url, instance.manifest);
@@ -94,6 +101,8 @@ export function initializeSW(
     async function handleNavigation(installed: InstalledServiceWorkerManager) {
       // let client = await STATE.instances.getWindowClient(e.clientId);
       let navigation = await installed.navigate(STATE, request);
+
+      console.log("navigation", navigation);
 
       await swGlobal.clients.claim();
 
@@ -115,7 +124,11 @@ const FETCH_MANAGERS = FetchManagers.default().add(
   FETCH_WASM,
   FETCH_SKYPACK,
   FETCH_LONG_LIVED,
-  FETCH_TS,
+  new TypescriptFetchManager((url) => {
+    return (
+      url.pathname.startsWith("/app/") || url.pathname.startsWith("/bootstrap/")
+    );
+  }),
   FETCH_LOCAL
 );
 

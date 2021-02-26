@@ -1,10 +1,114 @@
 {
   "sw.js": {
     "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/sw.js",
-    "hash": "2ce942b2060181d11424abdef11a3671066bd6f84c1c988907d9b09b3960be94"
+    "hash": "b47368e50219bfb6fa057a77d005ba28b0fdc90df0aa23cf14410aae01ed909a"
   },
-  "main.js": {
-    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/main.js",
-    "hash": "3ada867853228a25b2574c3fb98c2788f8ba26b3fe902af25cf35c445f8b7004"
+  "register-sw.js": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/register-sw.js",
+    "hash": "b5579c70654cf06695e27ebff340aab98a93549c8c9aaf2aba2b380673042a46"
+  },
+  "bootstrap/env.ts": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/bootstrap-src/bootstrap/env.ts",
+    "hash": "c285f25c1178af60fde9af06f494dabaf231f3f2bfd8ac089b1f5065aac4f455"
+  },
+  "bootstrap/result.ts": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/bootstrap-src/bootstrap/result.ts",
+    "hash": "33dad259095cb299c8266e916df6ebf34aca2505e7ffaf644f5e57c6b3426e8e"
+  },
+  "bootstrap/wasm.ts": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/bootstrap-src/bootstrap/wasm.ts",
+    "hash": "e5bf55021af8bb06dff25986992d8ef958762ac925c786e100cf6b7d3a3363c4"
+  },
+  "styles/app.css": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/styles/app.css",
+    "hash": "ae4ce88ed1d1ad46c9da0956cf5269ab5c2263578788e03f9f562283615c6c49"
+  },
+  "styles/index.css": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/styles/index.css",
+    "hash": "ba13e9d172527137a89f2d28659443408bbf02a9b0a5917fc84cab56ce880d2c"
+  },
+  "styles/scratch.css": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/styles/scratch.css",
+    "hash": "cd38dbdc4d1bc81c2097984bf5ce08dfe9f7d1c72782925fb09a35a3f19ba25d"
+  },
+  "styles/app/font-awesome.min.css": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/styles/app/font-awesome.min.css",
+    "hash": "333203fd8124e3c0bcfdfa27d7257417d5d0fd9e82fbacfb377d4a3c7580882c"
+  },
+  "styles/app/fonts.css": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/styles/app/fonts.css",
+    "hash": "a162e4e1398a0cc1ec830abef8bad549a80036e8cd65c22ee3103ae54024e013"
+  },
+  "styles/app/index.css": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/styles/app/index.css",
+    "hash": "d5d5095f41918f9a162b3ae69c2e9d588b57ad94ce048432382fcf7dd6f76b8a"
+  },
+  "styles/app/typesetting.css": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/styles/app/typesetting.css",
+    "hash": "39362252826e547668d0f6364d8ee71c902419274d6615a9509b355e7c2488e6"
+  },
+  "styles/foundation/index.css": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/styles/foundation/index.css",
+    "hash": "7f6ae28f7cb38c926055a74f4dd08d93f3209e7b7fe64e682994354beff3a360"
+  },
+  "styles/foundation/measure.css": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/styles/foundation/measure.css",
+    "hash": "d47a7cb859522befda8302e00f66c162a2c187a243e5ab368824167b411fa7e6"
+  },
+  "styles/foundation/modular.css": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/styles/foundation/modular.css",
+    "hash": "a10d629f975f933db54f26f39e39a589d7083e6e5612797e1d365acf6dc73e1f"
+  },
+  "styles/foundation/semantics.css": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/styles/foundation/semantics.css",
+    "hash": "acae88eca1596ec6570f090decd691526b48b4dbbb9c328181d7fcbb249b14f7"
+  },
+  "styles/layouts/README.md": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/styles/layouts/README.md",
+    "hash": "e09805c6a11c9919e462d417ccae2211b89977ec710f3ffc759d609ca8f3b715"
+  },
+  "styles/layouts/box.css": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/styles/layouts/box.css",
+    "hash": "e012bec0a20a94ffaf4fca2f7a56cd0545296db9854fba7155f31b689724e3df"
+  },
+  "styles/layouts/center.css": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/styles/layouts/center.css",
+    "hash": "ce0d4287b8b263306e4011407b38e9eda0a0418f4da17969440864ba8574edb8"
+  },
+  "styles/layouts/cluster.css": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/styles/layouts/cluster.css",
+    "hash": "e65bc156cbf3ddaa7d5540205dc59dd92115a100d553fb1d12a6ddbfcb25af82"
+  },
+  "styles/layouts/debug.css": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/styles/layouts/debug.css",
+    "hash": "9de4db6737b920d3ff1b6e77ab7436581ddf87765ea7911767df5692dce5cee3"
+  },
+  "styles/layouts/grid.css": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/styles/layouts/grid.css",
+    "hash": "34fcaa82e8e673dc91af8ae8ae664368e6c3e23c0b69614c7bea86f1876b6e7f"
+  },
+  "styles/layouts/index.css": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/styles/layouts/index.css",
+    "hash": "da94c1aa179193f1fe0e68c0f3c3332fb27b1d319a74b2b2e09fe42644821a66"
+  },
+  "styles/layouts/sidebar.css": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/styles/layouts/sidebar.css",
+    "hash": "6d3ab56fcae5beead5dd333f1071ced35bee4638e339ebef24dd39b8ba947df2"
+  },
+  "styles/layouts/stack.css": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/styles/layouts/stack.css",
+    "hash": "eeeef6d6b56adffccc2db155003e3188d715b02158881385af61198df5174e5a"
+  },
+  "styles/layouts/switch.css": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/styles/layouts/switch.css",
+    "hash": "e0e5481ecbbdb4b1a4fb14bf0e8c5e1064ffde8d80d5a5adff02f8ee641cabda"
+  },
+  "styles/layouts/text.css": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/styles/layouts/text.css",
+    "hash": "cc313d0c9a14c4942e12e956e6e61f50b71fe0224e10a0e2e707c8a8e1cdb462"
+  },
+  "styles/layouts/wrapper.css": {
+    "filename": "/home/wycats/Code/Glimmer3/quantum-layout/public/styles/layouts/wrapper.css",
+    "hash": "00c54aa7c02357dfa9635714d1d92d594b3ccb3a6965d0e0e5c8ab1e50d85763"
   }
 }

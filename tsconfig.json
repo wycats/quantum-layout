@@ -26,6 +26,8 @@
     "src/**/*.ts",
     "bootstrap-src/**/*.ts",
     "types/**/*.d.ts",
-    "scripts/*.mjs"
+    "scripts/*.mjs",
+    "bootstrap-src/main.js",
+    "public/app/**/*.ts"
   ]
 }

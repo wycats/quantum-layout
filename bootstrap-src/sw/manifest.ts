@@ -34,6 +34,11 @@ export class Manifest {
     let cachedDigest = await DIGEST.response(response.clone());
     let expectedDigest = this.digest(url);
 
+    ENV.trace("verbose", {
+      expected: expectedDigest,
+      cached: cachedDigest,
+    });
+
     return cachedDigest === expectedDigest;
   }
 
@@ -91,5 +96,8 @@ export class Manifest {
 
 async function fetchManifest(url: URL) {
   let response = await fetch(url.href, { cache: "reload" });
+
+  console.log("dev.json", await response.clone().json());
+
   return response.json();
 }

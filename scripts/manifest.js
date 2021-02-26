@@ -3,6 +3,7 @@ import crypto from "crypto";
 import fs from "fs/promises";
 import * as swc from "@swc/core";
 import shelljs from "shelljs";
+import globby from "globby";
 export const FileName = {
     root: (filename)=>{
         if (path.isAbsolute(filename)) {
@@ -52,8 +53,8 @@ export class UnknownFileName {
             return new UnknownFileName(this.root, relative);
         }
     }
-    constructor(root, relative1){
-        this.root = root;
+    constructor(root1, relative1){
+        this.root = root1;
         this.relative = relative1;
     }
 }
@@ -62,6 +63,26 @@ async function getStat(filename) {
         return await fs.stat(filename);
     } catch (e) {
         return null;
+    }
+}
+export class Glob {
+    static async of(root, glob) {
+        return new Glob(await DirectoryName.of(root), glob);
+    }
+    static async search(root, glob) {
+        let g = await Glob.of(root, glob);
+        return g.files();
+    }
+    async files() {
+        let files = await globby(this.glob, {
+            cwd: this.root.absolute
+        });
+        return files.map((f)=>new RegularFileName(this.root, f)
+        );
+    }
+    constructor(root2, glob1){
+        this.root = root2;
+        this.glob = glob1;
     }
 }
 export class DirectoryName {
@@ -86,8 +107,8 @@ export class DirectoryName {
             return new UnknownFileName(this.root, relative);
         }
     }
-    constructor(root1, relative2){
-        this.root = root1;
+    constructor(root3, relative2){
+        this.root = root3;
         this.relative = relative2;
     }
 }
@@ -110,13 +131,15 @@ export class RegularFileName {
         return file.text;
     }
     async write(source) {
+        let dir = path.dirname(this.absolute);
+        shelljs.mkdir("-p", dir);
         await fs.writeFile(this.absolute, source, {
             encoding: "utf-8"
         });
         return new LoadedFile(this, Buffer.from(source));
     }
-    constructor(root2, relative3){
-        this.root = root2;
+    constructor(root4, relative3){
+        this.root = root4;
         this.relative = relative3;
     }
 }
@@ -175,7 +198,23 @@ export class Manifest {
             }
         });
         let file = await to.write(output.code);
-        this.add(to.relative, file);
+        await this.add(to.relative, file);
+    }
+    async copy(from, to) {
+        for (let file of await from.files()){
+            let source = await file.read();
+            let target = await to.join(file.relative).asRegularFile({
+                allow: "missing"
+            });
+            await target.write(source.buffer);
+            await this.add(file.relative, source);
+        }
+    }
+    async notice(glob) {
+        for (let file of await glob.files()){
+            let source = await file.read();
+            await this.add(file.relative, source);
+        }
     }
     async bundle(from) {
         let source = await DirectoryName.of(from);
@@ -186,10 +225,10 @@ export class Manifest {
             silent: true
         });
         let target = await this.root.join("public").join(config.public).asRegularFile();
-        this.add(config.public, await target.read());
+        await this.add(config.public, await target.read());
     }
-    constructor(root3){
-        this.root = root3;
+    constructor(root5){
+        this.root = root5;
         this.entries = {
         };
     }

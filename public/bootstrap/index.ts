@@ -1,7 +1,7 @@
-import type { PublicExports, SugaryExports } from "./wasm.js";
+import type { PublicExports, SugaryExports } from "./wasm";
 
 export async function boot(): Promise<SugaryExports> {
-  let source = await fetch("/bootstrap/wasm.js");
+  let source = await fetch("/bootstrap/wasm");
   let body = await source.text();
 
   let bootWASM: () => Promise<PublicExports> = new Function(

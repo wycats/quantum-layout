@@ -8,13 +8,13 @@ const CATEGORIES = [
   "error",
   "verbose",
   "manager",
+  "local",
 ];
 type Category = typeof CATEGORIES[number];
 
 export const ENV = Environment.default<Category>("🧙").enable(
   "manager",
-  "cache",
-  "error"
+  "local"
 );
 //.enable("state","cache");
 

@@ -29,9 +29,11 @@ export class WasmFetchManager implements FetchManager {
 export const FETCH_WASM = new WasmFetchManager();
 
 export async function wasm(): Promise<SugaryExports> {
-  let source = await fetch("./bootstrap/wasm.js");
+  let raw = await fetch("/bootstrap/wasm.js");
+  let source = await raw.text();
+
   let bootWASM: () => Promise<PublicExports> = new Function(
-    `${await source.text()};\n\nreturn sugar`
+    `${await source};\n\nreturn sugar`
   )();
 
   return bootWASM();

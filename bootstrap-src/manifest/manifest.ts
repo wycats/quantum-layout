@@ -1,8 +1,9 @@
-import path from "path";
+import path, { format } from "path";
 import crypto from "crypto";
 import fs from "fs/promises";
 import * as swc from "@swc/core";
 import shelljs from "shelljs";
+import globby from "globby";
 
 export interface ManifestEntry {
   filename: string;
@@ -91,6 +92,33 @@ async function getStat(filename: string): Promise<import("fs").Stats | null> {
   }
 }
 
+export class Glob {
+  static async of(root: IntoDirectoryName, glob: string): Promise<Glob> {
+    return new Glob(await DirectoryName.of(root), glob);
+  }
+
+  static async search(
+    root: IntoDirectoryName,
+    glob: string
+  ): Promise<readonly RegularFileName[]> {
+    let g = await Glob.of(root, glob);
+    return g.files();
+  }
+
+  constructor(
+    private readonly root: DirectoryName,
+    private readonly glob: string
+  ) {}
+
+  async files(): Promise<readonly RegularFileName[]> {
+    let files = await globby(this.glob, {
+      cwd: this.root.absolute,
+    });
+
+    return files.map((f) => new RegularFileName(this.root, f));
+  }
+}
+
 export class DirectoryName implements FileName {
   static async of(name: IntoDirectoryName): Promise<DirectoryName> {
     if (name instanceof DirectoryName) {
@@ -150,6 +178,9 @@ export class RegularFileName implements FileName {
   }
 
   async write(source: string | Uint8Array): Promise<LoadedFile> {
+    let dir = path.dirname(this.absolute);
+    shelljs.mkdir("-p", dir);
+
     await fs.writeFile(this.absolute, source, {
       encoding: "utf-8",
     });
@@ -227,7 +258,27 @@ export class Manifest {
     });
 
     let file = await to.write(output.code);
-    this.add(to.relative, file);
+    await this.add(to.relative, file);
+  }
+
+  async copy(from: Glob, to: DirectoryName) {
+    for (let file of await from.files()) {
+      let source = await file.read();
+      let target = await to
+        .join(file.relative)
+        .asRegularFile({ allow: "missing" });
+
+      await target.write(source.buffer);
+
+      await this.add(file.relative, source);
+    }
+  }
+
+  async notice(glob: Glob) {
+    for (let file of await glob.files()) {
+      let source = await file.read();
+      await this.add(file.relative, source);
+    }
   }
 
   async bundle(from: IntoDirectoryName) {
@@ -248,6 +299,6 @@ export class Manifest {
       .join(config.public)
       .asRegularFile();
 
-    this.add(config.public, await target.read());
+    await this.add(config.public, await target.read());
   }
 }

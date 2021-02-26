@@ -12,6 +12,7 @@ devDependencies:
   eslint: 7.19.0
   eslint-import-resolver-typescript: 2.3.0_846d62cfa210dc3f225625c64ae883be
   eslint-plugin-import: 2.22.1_eslint@7.19.0
+  globby: 11.0.2
   localforage: 1.9.0
   rollup: 2.38.5
   sass: 1.32.7
@@ -19,7 +20,7 @@ devDependencies:
   typescript: 4.3.0-dev.20210210
 lockfileVersion: 5.2
 overrides:
-  typescript: ^4.2.0-dev.20210209
+  typescript: ^4.2.0-dev.20210210
 packages:
   /@babel/code-frame/7.12.11:
     dependencies:
@@ -102,7 +103,7 @@ packages:
   /@nodelib/fs.scandir/2.1.4:
     dependencies:
       '@nodelib/fs.stat': 2.0.4
-      run-parallel: 1.1.10
+      run-parallel: 1.2.0
     dev: true
     engines:
       node: '>= 8'
@@ -2057,6 +2058,10 @@ packages:
       node: '>=6'
     resolution:
       integrity: sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
+  /queue-microtask/1.2.2:
+    dev: true
+    resolution:
+      integrity: sha512-dB15eXv3p2jDlbOiNLyMabYg1/sXvppd8DP2J3EOCQ0AkuSXCW2tP7mnVouVLJKgUMY6yP0kcQDVpLCN13h4Xg==
   /quick-lru/4.0.1:
     dev: true
     engines:
@@ -2211,10 +2216,12 @@ packages:
       node: '>=0.12.0'
     resolution:
       integrity: sha512-tvVnVv01b8c1RrA6Ep7JkStj85Guv/YrMcwqYQnwjsAS2cTmmPGBBjAjpCW7RrSodNSoE2/qg9O4bceNvUuDgQ==
-  /run-parallel/1.1.10:
+  /run-parallel/1.2.0:
+    dependencies:
+      queue-microtask: 1.2.2
     dev: true
     resolution:
-      integrity: sha512-zb/1OuZ6flOlH6tQyMPUrE3x3Ulxjlo9WIVXR4yVYi4H9UXQaeIsPbLn2R3O3vQCnDKkAl2qHiuocKKX4Tz/Sw==
+      integrity: sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==
   /rxjs/6.6.3:
     dependencies:
       tslib: 1.14.1
@@ -2624,6 +2631,7 @@ specifiers:
   eslint: ^7.19.0
   eslint-import-resolver-typescript: ^2.3.0
   eslint-plugin-import: ^2.22.1
+  globby: ^11.0.2
   localforage: ^1.9.0
   rollup: ^2.38.5
   sass: ^1.32.7

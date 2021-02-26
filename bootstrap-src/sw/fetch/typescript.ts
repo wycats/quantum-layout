@@ -5,19 +5,30 @@ import { FetchManager } from "../manager/interfaces";
 import { updatedResponse } from "./utils";
 import { Manifest } from "../manifest";
 
+const TS_CACHE = caches.open("typescript.local");
+
 export class TypescriptFetchManager implements FetchManager {
   readonly name = "typescript";
 
+  constructor(readonly isMatch: (url: URL) => boolean) {}
+
   matches(request: Request, url: URL): boolean {
-    return url.pathname.endsWith(".ts");
+    return this.isMatch(url);
   }
 
   async fetch(
-    request: Request,
-    url: URL,
+    originalRequest: Request,
+    originalURL: URL,
     manifest: Manifest
   ): Promise<Response> {
-    let response = await fetchLocal(request, url, manifest);
+    let cache = await TS_CACHE;
+
+    let url = new URL(`${originalURL.href}.ts`);
+    let request = new Request(url.href, originalRequest);
+
+    let response = manifest.fetch(request, cache);
+
+    // let response = await fetchLocal(request, url, manifest);
     let string = await response.text();
 
     let transpiled = await transform(string);
@@ -32,5 +43,3 @@ export class TypescriptFetchManager implements FetchManager {
     });
   }
 }
-
-export const FETCH_TS = new TypescriptFetchManager();
